@@ -8,7 +8,8 @@ from base64 import decodebytes
 from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
-
+from collections import Counter
+import json
 
 st.set_page_config(layout="wide", page_icon="💻", page_title="ỨNG DỤNG NHẬN DẠNG TẾ BÁO MÁU")
 # Set up basic information
@@ -86,8 +87,19 @@ confidences = [box['confidence'] for box in output_dict['predictions']]
 
 ## Summary statistics section in main app.
 st.markdown("<h4 style='text-align: left; color: green;'; font-family:'Courier New'>BƯỚC 4: KẾT QUẢ THỐNG KÊ</h4>", unsafe_allow_html=True)
-st.markdown(f"<h5 style='text-align: left; color: green;'; font-family:'Courier New'> - SỐ LƯỢNG HỘP: {len(confidences)} </h5>", unsafe_allow_html=True)
-st.markdown(f"<h5 style='text-align: left; color: green;'; font-family:'Courier New'> - ĐỘ TIN CẬY TRUNG BÌNH MỖI HỘP: {(np.round(np.mean(confidences),4))}</h5>", unsafe_allow_html=True)
+C1, C2 = st.columns(2)
+C1.markdown(f"<h5 style='text-align: center; color: green;'; font-family:'Courier New'> - SỐ LƯỢNG TẾ BÀO TRONG ẢNH: {len(confidences)} </h5>", unsafe_allow_html=True)
+C2.markdown(f"<h5 style='text-align: center; color: green;'; font-family:'Courier New'> - ĐỘ TIN CẬY TRUNG BÌNH: {(np.round(np.mean(confidences),4))}</h5>", unsafe_allow_html=True)
+
+# Cell count
+output_string = json.dumps(output_dict)
+platelets_num = output_string.count('Platelets')
+wbc_num = output_string.count('WBC')
+rbc_num = output_string.count('RBC')
+c1, c2, c3 = st.columns(3)
+c1.markdown(f"<h5 style='text-align: center; color: grey;'; font-family:'Courier New'> - SỐ LƯỢNG TIỂU CẦU TRONG ẢNH: {platelets_num} </h5>", unsafe_allow_html=True)
+c2.markdown(f"<h5 style='text-align: center; color: purple;'; font-family:'Courier New'> - SỐ LƯỢNG BẠCH CẦU TRONG ẢNH: {wbc_num} </h5>", unsafe_allow_html=True)
+c3.markdown(f"<h5 style='text-align: center; color: red;'; font-family:'Courier New'> - SỐ LƯỢNG HỒNG CẦU TRONG ẢNH: {rbc_num} </h5>", unsafe_allow_html=True)
 
 ## Histogram in main app.
 _, C, _ = st.columns(3)
@@ -95,11 +107,6 @@ fig, ax = plt.subplots()
 ax.hist(confidences, bins=10, range=(0.0,1.0))
 C.pyplot(fig)
 C.markdown("<h4 style='text-align: center; color: green;'; font-family:'Courier New'>BIỂU ĐỒ HISTOGRAM VỀ ĐỘ TIN CẬY</h4>", unsafe_allow_html=True)
-
-## Display the JSON in main app.
-#st.write('### JSON Output')
-#st.write(r.json())
-
 
 # Footer
 footer = """
